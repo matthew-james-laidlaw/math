@@ -1,2 +1,2 @@
-add_executable(tests LexerTests.cpp)
-target_link_libraries(tests gtest_main solver)
+add_executable(tests LexerTests.cpp ParserTests.cpp)
+target_link_libraries(tests gmock_main solver)

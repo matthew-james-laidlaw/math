@@ -12,52 +12,20 @@ private:
 
 public:
 
-    Parser(std::vector<Token> const& source)
-        : source(source), iter(source.cbegin())
-    {}
+    Parser(std::vector<Token> const& source);
 
-    auto Parse() -> Expression*
-    {
-        return ParseAdditiveOperation();
-    }
+    auto Parse() -> Expression*;
 
 private:
 
-    auto ParseAdditiveOperation() -> Expression*
-    {
+    auto ParseAdditiveOperation() -> Expression*;
+    auto ParseMultiplicativeOperation() -> Expression*;
+    auto ParseUnary() -> Expression*;
+    auto ParsePrimary() -> Expression*;
 
-    }
-
-    auto ParseMultiplicativeOperation() -> Expression*
-    {
-
-    }
-
-    auto parseUnary() -> Expression*
-    {
-        
-    }
-
-    auto ParsePrimary() -> Expression*
-    {
-
-    }
-
-    auto Done() const -> bool
-    {
-        return iter == source.cend();
-    }
+    auto Done() const -> bool;
 
 };
 
-auto Parse(std::vector<Token> const& source) -> Expression*
-{
-    auto parser = Parser(source);
-    return parser.Parse();
-}
-
-auto Parse(std::string const& source) -> Expression*
-{
-    auto lexed = Lex(source);
-    return Parse(lexed);
-}
+auto Parse(std::vector<Token> const& source) -> Expression*;
+auto Parse(std::string const& source) -> Expression*;
