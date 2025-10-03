@@ -18,10 +18,30 @@ public:
 
     auto Parse() -> Expression*
     {
-
+        return ParseAdditiveOperation();
     }
 
 private:
+
+    auto ParseAdditiveOperation() -> Expression*
+    {
+
+    }
+
+    auto ParseMultiplicativeOperation() -> Expression*
+    {
+
+    }
+
+    auto parseUnary() -> Expression*
+    {
+        
+    }
+
+    auto ParsePrimary() -> Expression*
+    {
+
+    }
 
     auto Done() const -> bool
     {
