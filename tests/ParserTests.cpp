@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 
 #include <Parser.h>
+#include <Lexer.h>
 
 using namespace std::string_literals;
 
@@ -26,21 +27,21 @@ MATCHER_P(IsBinary, op, "")
 TEST(ParserTests, ParseIdentifier)
 {
     auto source = "abc"s;
-    auto ast = Parse(source);
-    EXPECT_THAT(ast, IsVariable("abc"));
+    auto ast = Parser(Lexer(source).Lex()).ParseAdditiveOperation();
+    ASSERT_THAT(ast, IsVariable("abc"));
 }
 
 TEST(ParserTests, ParseNumber)
 {
     auto source = "123"s;
-    auto ast = Parse(source);
-    EXPECT_THAT(ast, IsLiteral(123.0));
+    auto ast = Parser(Lexer(source).Lex()).ParseAdditiveOperation();
+    ASSERT_THAT(ast, IsLiteral(123.0));
 }
 
 TEST(ParserTests, ParseExpression)
 {
-    auto source = "1 + 2 * 3 + 4";
-    auto ast = Parse(source);
+    auto source = "1 + 2 * 3 + 4"s;
+    auto ast = Parser(Lexer(source).Lex()).ParseAdditiveOperation();
 
     auto root = dynamic_cast<Binary*>(ast);
     ASSERT_THAT(root, IsBinary(Token::Type::Plus));
@@ -48,12 +49,32 @@ TEST(ParserTests, ParseExpression)
     auto left = dynamic_cast<Binary*>(root->left);
     ASSERT_THAT(left, IsBinary(Token::Type::Plus));
 
-    EXPECT_THAT(root->right, IsLiteral(4.0));
-    EXPECT_THAT(left->left, IsLiteral(1.0));
+    ASSERT_THAT(root->right, IsLiteral(4.0));
+    ASSERT_THAT(left->left, IsLiteral(1.0));
 
     auto mul = dynamic_cast<Binary*>(left->right);
     ASSERT_THAT(mul, IsBinary(Token::Type::Star));
 
-    EXPECT_THAT(mul->left, IsLiteral(2.0));
-    EXPECT_THAT(mul->right, IsLiteral(3.0));
+    ASSERT_THAT(mul->left, IsLiteral(2.0));
+    ASSERT_THAT(mul->right, IsLiteral(3.0));
+}
+
+TEST(ParserTests, ParseEquation)
+{
+    auto source = "1 + 2 = 3 + 4"s;
+    auto ast = Parse(source);
+
+    auto equation = dynamic_cast<Equation*>(ast);
+    ASSERT_NE(equation, nullptr);
+
+    auto left = dynamic_cast<Binary*>(equation->left);
+    ASSERT_THAT(left, IsBinary(Token::Type::Plus));
+
+    auto right = dynamic_cast<Binary*>(equation->right);
+    ASSERT_THAT(right , IsBinary(Token::Type::Plus));
+
+    ASSERT_THAT(left->left, IsLiteral(1.0));
+    ASSERT_THAT(left->right, IsLiteral(2.0));
+    ASSERT_THAT(right->left, IsLiteral(3.0));
+    ASSERT_THAT(right->right, IsLiteral(4.0));
 }

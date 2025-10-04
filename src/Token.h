@@ -7,7 +7,7 @@ struct Token
     enum class Type
     {
         Plus, Minus, Star, Slash,
-        Identifier, Number
+        Identifier, Number, Equals
     };
 
     Type type;

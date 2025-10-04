@@ -60,3 +60,16 @@ public:
     {}
     
 };
+
+class Equation : public Expression
+{
+public:
+
+    Expression* left;
+    Expression* right;
+
+    Equation(Expression* left, Expression* right)
+        : left(left), right(right)
+    {}
+
+};

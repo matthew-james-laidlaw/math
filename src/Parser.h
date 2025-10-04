@@ -15,14 +15,13 @@ public:
     Parser(std::vector<Token> const& source);
 
     auto Parse() -> Expression*;
-
-private:
-
+    
+    auto ParseEquation() -> Expression*;
     auto ParseAdditiveOperation() -> Expression*;
     auto ParseMultiplicativeOperation() -> Expression*;
     auto ParseUnary() -> Expression*;
     auto ParsePrimary() -> Expression*;
-
+    
     auto Done() const -> bool;
 
 };

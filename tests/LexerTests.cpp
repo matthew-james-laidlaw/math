@@ -9,9 +9,9 @@ TEST(LexerTests, LexIdentifier)
     auto source = "abc"s;
     auto lexed = Lex(source);
 
-    EXPECT_EQ(lexed.size(), 1);
-    EXPECT_EQ(lexed[0].type, Token::Type::Identifier);
-    EXPECT_EQ(lexed[0].lexeme, "abc");
+    ASSERT_EQ(lexed.size(), 1);
+    ASSERT_EQ(lexed[0].type, Token::Type::Identifier);
+    ASSERT_EQ(lexed[0].lexeme, "abc");
 }
 
 TEST(LexerTests, LexNumber)
@@ -19,9 +19,9 @@ TEST(LexerTests, LexNumber)
     auto source = "123"s;
     auto lexed = Lex(source);
         
-    EXPECT_EQ(lexed.size(), 1);
-    EXPECT_EQ(lexed[0].type, Token::Type::Number);
-    EXPECT_EQ(lexed[0].lexeme, "123");
+    ASSERT_EQ(lexed.size(), 1);
+    ASSERT_EQ(lexed[0].type, Token::Type::Number);
+    ASSERT_EQ(lexed[0].lexeme, "123");
 }
 
 TEST(LexerTests, LexOperator)
@@ -29,9 +29,9 @@ TEST(LexerTests, LexOperator)
     auto source = "+"s;
     auto lexed = Lex(source);
 
-    EXPECT_EQ(lexed.size(), 1);
-    EXPECT_EQ(lexed[0].type, Token::Type::Plus);
-    EXPECT_EQ(lexed[0].lexeme, "+");
+    ASSERT_EQ(lexed.size(), 1);
+    ASSERT_EQ(lexed[0].type, Token::Type::Plus);
+    ASSERT_EQ(lexed[0].lexeme, "+");
 }
 
 TEST(LexerTests, LexMany)
@@ -39,14 +39,14 @@ TEST(LexerTests, LexMany)
     auto source = "x + 1"s;
     auto lexed = Lex(source);
 
-    EXPECT_EQ(lexed.size(), 3);
+    ASSERT_EQ(lexed.size(), 3);
 
-    EXPECT_EQ(lexed[0].type, Token::Type::Identifier);
-    EXPECT_EQ(lexed[0].lexeme, "x");
+    ASSERT_EQ(lexed[0].type, Token::Type::Identifier);
+    ASSERT_EQ(lexed[0].lexeme, "x");
 
-    EXPECT_EQ(lexed[1].type, Token::Type::Plus);
-    EXPECT_EQ(lexed[1].lexeme, "+");
+    ASSERT_EQ(lexed[1].type, Token::Type::Plus);
+    ASSERT_EQ(lexed[1].lexeme, "+");
 
-    EXPECT_EQ(lexed[2].type, Token::Type::Number);
-    EXPECT_EQ(lexed[2].lexeme, "1");
+    ASSERT_EQ(lexed[2].type, Token::Type::Number);
+    ASSERT_EQ(lexed[2].lexeme, "1");
 }

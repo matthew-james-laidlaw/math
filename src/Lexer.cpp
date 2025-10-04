@@ -33,7 +33,7 @@ auto Lexer::LexElement() -> Token
     {
         return LexNumber();
     }
-    else if (std::string("+-*/").contains(*iter))
+    else if (std::string("+-*/=").contains(*iter))
     {
         return LexOperator();
     }
@@ -94,6 +94,10 @@ auto Lexer::LexOperator() -> Token
         case '/': return Token {
             .type = Token::Type::Slash,
             .lexeme = "/"
+        };
+        case '=': return Token {
+            .type = Token::Type::Equals,
+            .lexeme = "="
         };
         default: throw std::runtime_error(std::format("unexpected operator '{}'", *iter));
     }

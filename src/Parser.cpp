@@ -9,7 +9,21 @@ Parser::Parser(std::vector<Token> const& source)
 
 auto Parser::Parse() -> Expression*
 {
-    return ParseAdditiveOperation();
+    return ParseEquation();
+}
+
+auto Parser::ParseEquation() -> Expression*
+{
+    auto left = ParseAdditiveOperation();
+
+    if ((iter++)->type != Token::Type::Equals)
+    {
+        throw std::runtime_error("expected an equation");
+    }
+
+    auto right = ParseAdditiveOperation();
+
+    return new Equation(left, right);
 }
 
 auto Parser::ParseAdditiveOperation() -> Expression*
