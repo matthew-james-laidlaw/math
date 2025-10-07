@@ -13,8 +13,8 @@ TEST(SimplifierTests, ConstantFolding)
     SimplifyStep(ast);
 
     auto lit = dynamic_cast<Literal*>(ast);
-    EXPECT_NE(lit, nullptr);
-    EXPECT_EQ(lit->value, 3.0);
+    ASSERT_NE(lit, nullptr);
+    ASSERT_EQ(lit->value, 3.0);
 }
 
 TEST(SimplifierTests, AdditiveIdentityLeft)
@@ -25,8 +25,8 @@ TEST(SimplifierTests, AdditiveIdentityLeft)
     SimplifyStep(ast);
 
     auto var = dynamic_cast<Variable*>(ast);
-    EXPECT_NE(var, nullptr);
-    EXPECT_EQ(var->identifier, "x");
+    ASSERT_NE(var, nullptr);
+    ASSERT_EQ(var->identifier, "x");
 }
 
 TEST(SimplifierTests, AdditiveIdentityRight)
@@ -37,8 +37,8 @@ TEST(SimplifierTests, AdditiveIdentityRight)
     SimplifyStep(ast);
 
     auto var = dynamic_cast<Variable*>(ast);
-    EXPECT_NE(var, nullptr);
-    EXPECT_EQ(var->identifier, "x");
+    ASSERT_NE(var, nullptr);
+    ASSERT_EQ(var->identifier, "x");
 }
 
 TEST(SimplifierTests, SubtractionIdentity)
@@ -49,8 +49,8 @@ TEST(SimplifierTests, SubtractionIdentity)
     SimplifyStep(ast);
 
     auto var = dynamic_cast<Variable*>(ast);
-    EXPECT_NE(var, nullptr);
-    EXPECT_EQ(var->identifier, "x");
+    ASSERT_NE(var, nullptr);
+    ASSERT_EQ(var->identifier, "x");
 }
 
 TEST(SimplifierTests, MultiplicativeIdentityLeft)
@@ -61,8 +61,8 @@ TEST(SimplifierTests, MultiplicativeIdentityLeft)
     SimplifyStep(ast);
 
     auto var = dynamic_cast<Variable*>(ast);
-    EXPECT_NE(var, nullptr);
-    EXPECT_EQ(var->identifier, "x");
+    ASSERT_NE(var, nullptr);
+    ASSERT_EQ(var->identifier, "x");
 }
 
 TEST(SimplifierTests, MultiplicativeIdentityRight)
@@ -73,8 +73,8 @@ TEST(SimplifierTests, MultiplicativeIdentityRight)
     SimplifyStep(ast);
 
     auto var = dynamic_cast<Variable*>(ast);
-    EXPECT_NE(var, nullptr);
-    EXPECT_EQ(var->identifier, "x");
+    ASSERT_NE(var, nullptr);
+    ASSERT_EQ(var->identifier, "x");
 }
 
 TEST(SimplifierTests, DivisionIdentity)
@@ -85,6 +85,6 @@ TEST(SimplifierTests, DivisionIdentity)
     SimplifyStep(ast);
 
     auto var = dynamic_cast<Variable*>(ast);
-    EXPECT_NE(var, nullptr);
-    EXPECT_EQ(var->identifier, "x");
+    ASSERT_NE(var, nullptr);
+    ASSERT_EQ(var->identifier, "x");
 }

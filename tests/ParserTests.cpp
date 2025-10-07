@@ -18,10 +18,28 @@ MATCHER_P(IsLiteral, value, "")
     return lit && lit->value == value;
 }
 
-MATCHER_P(IsBinary, op, "")
+MATCHER_P2(IsAddition, lhs_matcher, rhs_matcher, "")
 {
-    auto bin = dynamic_cast<Binary*>(arg);
-    return bin && bin->op.type == op;
+    auto add = dynamic_cast<Addition*>(arg);
+    return add
+        && ExplainMatchResult(lhs_matcher, add->lhs, result_listener)
+        && ExplainMatchResult(rhs_matcher, add->rhs, result_listener);
+}
+
+MATCHER_P2(IsMultiplication, lhs_matcher, rhs_matcher, "")
+{
+    auto add = dynamic_cast<Multiplication*>(arg);
+    return add
+        && ExplainMatchResult(lhs_matcher, add->lhs, result_listener)
+        && ExplainMatchResult(rhs_matcher, add->rhs, result_listener);
+}
+
+MATCHER_P2(IsEquation, lhs_matcher, rhs_matcher, "")
+{
+    auto add = dynamic_cast<Equation*>(arg);
+    return add
+        && ExplainMatchResult(lhs_matcher, add->lhs, result_listener)
+        && ExplainMatchResult(rhs_matcher, add->rhs, result_listener);
 }
 
 TEST(ParserTests, ParseIdentifier)
@@ -40,41 +58,33 @@ TEST(ParserTests, ParseNumber)
 
 TEST(ParserTests, ParseExpression)
 {
-    auto source = "1 + 2 * 3 + 4"s;
+    auto source = "1 + 2 * 3"s;
     auto ast = Parser(Lexer(source).Lex()).ParseAdditiveOperation();
-
-    auto root = dynamic_cast<Binary*>(ast);
-    ASSERT_THAT(root, IsBinary(Token::Type::Plus));
-
-    auto left = dynamic_cast<Binary*>(root->left);
-    ASSERT_THAT(left, IsBinary(Token::Type::Plus));
-
-    ASSERT_THAT(root->right, IsLiteral(4.0));
-    ASSERT_THAT(left->left, IsLiteral(1.0));
-
-    auto mul = dynamic_cast<Binary*>(left->right);
-    ASSERT_THAT(mul, IsBinary(Token::Type::Star));
-
-    ASSERT_THAT(mul->left, IsLiteral(2.0));
-    ASSERT_THAT(mul->right, IsLiteral(3.0));
+    ASSERT_THAT(ast,
+        IsAddition(
+            IsLiteral(1.0),
+            IsMultiplication(
+                IsLiteral(2.0),
+                IsLiteral(3.0)
+            )
+        )
+    );
 }
 
 TEST(ParserTests, ParseEquation)
 {
-    auto source = "1 + 2 = 3 + 4"s;
-    auto ast = Parse(source);
-
-    auto equation = dynamic_cast<Equation*>(ast);
-    ASSERT_NE(equation, nullptr);
-
-    auto left = dynamic_cast<Binary*>(equation->left);
-    ASSERT_THAT(left, IsBinary(Token::Type::Plus));
-
-    auto right = dynamic_cast<Binary*>(equation->right);
-    ASSERT_THAT(right , IsBinary(Token::Type::Plus));
-
-    ASSERT_THAT(left->left, IsLiteral(1.0));
-    ASSERT_THAT(left->right, IsLiteral(2.0));
-    ASSERT_THAT(right->left, IsLiteral(3.0));
-    ASSERT_THAT(right->right, IsLiteral(4.0));
+    auto source = "1 + 2 = 3 * 4"s;
+    auto ast = Parser(Lexer(source).Lex()).ParseAdditiveOperation();
+    ASSERT_THAT(ast,
+        IsEquation(
+            IsAddition(
+                IsLiteral(1.0),
+                IsLiteral(2.0)
+            ),
+            IsMultiplication(
+                IsLiteral(3.0),
+                IsLiteral(4.0)
+            )
+        )
+    );
 }

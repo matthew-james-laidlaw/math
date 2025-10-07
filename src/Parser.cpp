@@ -7,12 +7,7 @@ Parser::Parser(std::vector<Token> const& source)
     : source(source), iter(source.cbegin())
 {}
 
-auto Parser::Parse() -> Expression*
-{
-    return ParseEquation();
-}
-
-auto Parser::ParseEquation() -> Expression*
+auto Parser::Parse() -> Equation*
 {
     auto left = ParseAdditiveOperation();
 
@@ -34,7 +29,13 @@ auto Parser::ParseAdditiveOperation() -> Expression*
     {
         auto op = *(iter++);
         auto right = ParseMultiplicativeOperation();
-        root = new Binary(root, right, op);
+
+        if (op.type == Token::Type::Minus)
+        {
+            right = new Negation(right);
+        }
+
+        root = new Addition(root, right);
     }
 
     return root;
@@ -48,7 +49,13 @@ auto Parser::ParseMultiplicativeOperation() -> Expression*
     {
         auto op = *(iter++);
         auto right = ParseUnary();
-        root = new Binary(root, right, op);
+
+        if (op.type == Token::Type::Slash)
+        {
+            right = new Power(right, -1.0);
+        }
+
+        root = new Multiplication(root, right);
     }
 
     return root;
@@ -56,11 +63,10 @@ auto Parser::ParseMultiplicativeOperation() -> Expression*
 
 auto Parser::ParseUnary() -> Expression*
 {
-    auto current = *iter;
-    if (current.type == Token::Type::Minus)
+    if (iter->type == Token::Type::Minus)
     {
         ++iter;
-        return new Unary(ParseUnary(), current);
+        return new Negation(ParseUnary());
     }
     else
     {
@@ -84,13 +90,13 @@ auto Parser::Done() const -> bool
     return iter == source.cend();
 }
 
-auto Parse(std::vector<Token> const& source) -> Expression*
+auto Parse(std::vector<Token> const& source) -> Equation*
 {
     auto parser = Parser(source);
     return parser.Parse();
 }
 
-auto Parse(std::string const& source) -> Expression*
+auto Parse(std::string const& source) -> Equation*
 {
     auto lexed = Lex(source);
     return Parse(lexed);

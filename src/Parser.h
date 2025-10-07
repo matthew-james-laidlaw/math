@@ -14,9 +14,8 @@ public:
 
     Parser(std::vector<Token> const& source);
 
-    auto Parse() -> Expression*;
+    auto Parse() -> Equation*;
     
-    auto ParseEquation() -> Expression*;
     auto ParseAdditiveOperation() -> Expression*;
     auto ParseMultiplicativeOperation() -> Expression*;
     auto ParseUnary() -> Expression*;
@@ -26,5 +25,5 @@ public:
 
 };
 
-auto Parse(std::vector<Token> const& source) -> Expression*;
-auto Parse(std::string const& source) -> Expression*;
+auto Parse(std::vector<Token> const& source) -> Equation*;
+auto Parse(std::string const& source) -> Equation*;

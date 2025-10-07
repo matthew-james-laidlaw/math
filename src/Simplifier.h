@@ -26,16 +26,29 @@ auto TryConstantFolding(Expression*& expr) -> bool
         return false;
     }
 
-    auto lhs = dynamic_cast<Literal*>(bin->left);
-    auto rhs = dynamic_cast<Literal*>(bin->right);
+    auto lhs = dynamic_cast<Literal*>(bin->lhs);
+    auto rhs = dynamic_cast<Literal*>(bin->rhs);
 
     if (!lhs || !rhs)
     {
         return false;
     }
 
-    expr = new Literal(GetOp(bin->op)(lhs->value, rhs->value));
-    return true;
+    auto addition = dynamic_cast<Addition*>(bin);
+    if (addition)
+    {
+        expr = new Literal(lhs->value + rhs->value);
+        return true;
+    }
+
+    auto multiplication = dynamic_cast<Multiplication*>(bin);
+    if (multiplication)
+    {
+        expr = new Literal(lhs->value * rhs->value);
+        return true;
+    }
+
+    return false;
 }
 
 auto TryIdentityRules(Expression*& expr) -> bool
@@ -46,33 +59,49 @@ auto TryIdentityRules(Expression*& expr) -> bool
     {
         return false;
     }
-
-    auto lhs_lit = dynamic_cast<Literal*>(bin->left);
-    auto rhs_lit = dynamic_cast<Literal*>(bin->right);
-
-    if (bin->op.type == Token::Type::Plus)
+    
+    auto is_addition = dynamic_cast<Addition*>(bin);
+    if (is_addition)
     {
-        bool additive_identity_left = lhs_lit && lhs_lit->value == 0.0;
-        bool additive_identity_right = rhs_lit && rhs_lit->value == 0.0;
-        if (additive_identity_left) { expr = bin->right; return true; }
-        if (additive_identity_right) { expr = bin->left; return true; }
+        auto lhs_lit = dynamic_cast<Literal*>(bin->lhs);
+        bool additive_identity_lhs = lhs_lit && lhs_lit->value == 0.0;
+        if (additive_identity_lhs)
+        {
+            expr = bin->rhs;
+            return true;
+        }
+        
+        auto rhs_lit = dynamic_cast<Literal*>(bin->rhs);
+        bool additive_identity_rhs = rhs_lit && rhs_lit->value == 0.0;
+        if (additive_identity_rhs)
+        {
+            expr = bin->lhs;
+            return true;
+        }
+        
+        return false;
     }
-    else if (bin->op.type == Token::Type::Minus)
+    
+    auto is_multiplication = dynamic_cast<Multiplication*>(bin);
+    if (is_multiplication)
     {
-        bool subtraction_identity = rhs_lit && rhs_lit->value == 0.0;
-        if (subtraction_identity) { expr = bin->left; return true; }
-    }
-    else if (bin->op.type == Token::Type::Star)
-    {
-        bool multiplicative_identity_left = lhs_lit && lhs_lit->value == 1.0;
-        bool multiplicative_identity_right = rhs_lit && rhs_lit->value == 1.0;
-        if (multiplicative_identity_left) { expr = bin->right; return true; }
-        if (multiplicative_identity_right) { expr = bin->left; return true; }
-    }
-    else if (bin->op.type == Token::Type::Slash)
-    {
-        bool division_identity = rhs_lit && rhs_lit->value == 1.0;
-        if (division_identity) { expr = bin->left; return true; }
+        auto lhs_lit = dynamic_cast<Literal*>(bin->lhs);
+        bool multiplicative_identity_lhs = lhs_lit && lhs_lit->value == 1.0;
+        if (multiplicative_identity_lhs)
+        {
+            expr = bin->rhs;
+            return true;
+        }
+        
+        auto rhs_lit = dynamic_cast<Literal*>(bin->rhs);
+        bool multiplicative_identity_rhs = rhs_lit && rhs_lit->value == 1.0;
+        if (multiplicative_identity_rhs)
+        {
+            expr = bin->lhs;
+            return true;
+        }
+        
+        return false;
     }
 
     return false;
@@ -84,8 +113,8 @@ auto SimplifyStep(Expression*& expr) -> bool
 
     if (auto bin = dynamic_cast<Binary*>(expr))
     {
-        changed |= SimplifyStep(bin->left);
-        changed |= SimplifyStep(bin->right);
+        changed |= SimplifyStep(bin->lhs);
+        changed |= SimplifyStep(bin->rhs);
 
         if (TryConstantFolding(expr))
         {
@@ -96,6 +125,16 @@ auto SimplifyStep(Expression*& expr) -> bool
         {
             return true;
         }
+
+        // if (TryAnnihilationRules(expr))
+        // {
+        //     return true;
+        // }
+
+        // if (TryCancellationRules(expr))
+        // {
+        //     return true;
+        // }
     }
 
     return changed;
@@ -107,14 +146,14 @@ auto Simplify(Equation* root) -> void
 
     while (changed)
     {
-        changed = SimplifyStep(root->left);
+        changed = SimplifyStep(root->lhs);
     }
 
     changed = true;
 
     while (changed)
     {
-        changed = SimplifyStep(root->right);
+        changed = SimplifyStep(root->rhs);
     }
 
     return;
